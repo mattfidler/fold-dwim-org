@@ -5,10 +5,11 @@
 ;; Author: Matthew L. Fidler & Shane Celis
 ;; Maintainer: Matthew L. Fidler
 ;; Created: Tue Oct  5 12:19:45 2010 (-0500)
-;; Version: 
-;;Last-Updated: Thu Dec  1 16:26:32 2011 (-0600)
+;; Version: 0.1
+;; Package-Requires: ((fold-dwim "1.2"))
+;; Last-Updated: Thu Dec  1 17:23:33 2011 (-0600)
 ;;           By: Matthew L. Fidler
-;;     Update #: 97
+;;     Update #: 105
 ;; URL: 
 ;; Keywords: 
 ;; Compatibility: 
@@ -73,14 +74,26 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; 
 ;;; Code:
-;;(setq debug-on-error 't)
+
+;; Change Log:
+;; 08-Feb-2011    Matthew L. Fidler  
+;;    Last-Updated: Mon Oct 25 10:57:19 2010 (-0500) #33 (Matthew L. Fidler) #102 (Matthew L. Fidler)
+;;    Added code to byte-compile properly 
+
+;; 08-Feb-2011    Matthew L. Fidler  
+;;    Last-Updated: Mon Oct 25 10:57:19 2010 (-0500) #33 (Matthew L. Fidler) #98 (Matthew L. Fidler)
+;;    Updated ELPA type comments.
+
+
+
+
 (require 'fold-dwim)
-(setq fold-dwim-org/trigger-keys-block nil)
-(defvar fold-dwim-org/trigger-keys-block nil;(list (kbd "TAB"))
+(eval-when  (compile load eval)
+  (defvar fold-dwim-org/trigger-keys-block nil;(list (kbd "TAB"))
   "The keys to bind to toggle block visibility.")
 
 (defvar fold-dwim-org/trigger-keys-all (list [S-tab] [S-iso-lefttab] [(shift tab)] [backtab])
-  "The keys to bind to toggle all block visibility.")
+  "The keys to bind to toggle all block visibility."))
 
 (defvar fold-dwim-org/minor-mode-map nil
   "The keymap of fold-dwim-org/minor-mode")
@@ -100,12 +113,15 @@
 (defmacro fold-dwim-org/define-keys ()
   `(progn 
      ,@(when fold-dwim-org/trigger-keys-block (mapcar (lambda (key) `(fold-dwim-org/define-key ,key fold-dwim-org/toggle)) fold-dwim-org/trigger-keys-block))
-     ,@(mapcar (lambda (key) `(fold-dwim-org/define-key ,key fold-dwim-org/hideshow-all)) fold-dwim-org/trigger-keys-all)))
-(defvar fold-dwim-org/last-point nil)
+     ,@(mapcar (lambda (key) `(fold-dwim-org/define-key ,key fold-dwim-org/hideshow-all)) fold-dwim-org/trigger-keys-all)
+     ))
+(defvar fold-dwim-org/last-point nil
+  )
 (defvar fold-dwim-org/last-txt nil)
 (defun fold-dwim-org/should-fold (last-point current-point)
   "* Checks to see if buffer has changed.  If not folding should occur."
-  (equal last-point current-point))
+  (equal last-point current-point)
+  )
 (defvar fold-dwim-org/mark-active nil)
 (make-variable-buffer-local 'fold-dwim-org/mark-active)
 (defun fold-dwim-org/hs-pre ()
@@ -115,8 +131,11 @@
       (unless (minibufferp)
         (setq fold-dwim-org/mark-active mark-active)
         (setq fold-dwim-org/last-point (point))
-        (setq fold-dwim-org/last-txt (buffer-substring (point-at-bol) (point-at-eol)))))))
-
+        (setq fold-dwim-org/last-txt (buffer-substring (point-at-bol) (point-at-eol)))
+        )
+      )
+    )
+  )
 (defun fold-dwim-org/hs-post ()
   "* Post-command hook to hide/show if `fold-dwim-org/trigger-keys-block' is nil"
   (condition-case error
@@ -126,14 +145,12 @@
             (unless (minibufferp)
               (unless fold-dwim-org/mark-active
                 (when (eq ?\t last-command-event)
-                                        ;          (unless (string= fold-dwim-org/last-txt
-                                        ;                           (buffer-substring (point-at-bol) (point-at-eol)))
                   (unless (and (fboundp 'yas/snippets-at-point)
-                               (< 0 (length (yas/snippets-at-point 'all-snippets)))
-                               )
+                               (< 0 (length (yas/snippets-at-point 'all-snippets))))
                     (fold-dwim-org/toggle nil fold-dwim-org/last-point))))))))
     (error
      (message "HS Org post-command hook error: %s" (error-message-string error)))))
+
 
 (add-hook 'post-command-hook 'fold-dwim-org/hs-post)
 (add-hook 'pre-command-hook 'fold-dwim-org/hs-pre)
@@ -158,17 +175,22 @@ You can customize the key through `fold-dwim-org/trigger-key-block'."
   ;; The indicator for the mode line.  Nothing.
   ""
   :group 'editing
-  
+
   (fold-dwim-org/define-keys)
   ;; We want hs-minor-mode on when fold-dwim-org/minor-mode is on.
-  (let ((hs (assoc 'hs-minor-mode minor-mode-alist)))
+  (let (
+        (hs (assoc 'hs-minor-mode minor-mode-alist))
+        )
     (when hs
       (setq hs (cdr hs))
       (if fold-dwim-org/minor-mode
           (setcar hs (replace-regexp-in-string "[*]*$" "*" (car hs)))
-        (setcar hs (replace-regexp-in-string "[*]+$" "" (car hs)))))
+        (setcar hs (replace-regexp-in-string "[*]+$" "" (car hs)))
+        )
+      )
     ;; TODO add indicators in other modes.
-    ))
+    )
+  )
 
 (defun fold-dwim-org/toggle (&optional key lst-point)
   "Hide or show a block."
@@ -179,8 +201,7 @@ You can customize the key through `fold-dwim-org/trigger-key-block'."
            (command (if key (key-binding key) nil))
            (other-keys fold-dwim-org/trigger-keys-block))
       (unless command
-        (setq command 'indent-for-tab-command)
-        )
+        (setq command 'indent-for-tab-command))
       (while (and (null command)
                   (not (null other-keys)))
         (setq command (key-binding (car other-keys)))
@@ -191,7 +212,8 @@ You can customize the key through `fold-dwim-org/trigger-key-block'."
           )
         )
       (when (fold-dwim-org/should-fold last-point (point))
-        (fold-dwim-toggle)))))
+        (fold-dwim-toggle)
+        ))))
 
 (defun fold-dwim-org/hideshow-all (&optional key)
   "Hide or show all blocks."

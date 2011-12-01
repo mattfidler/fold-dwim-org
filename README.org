@@ -1,0 +1,6 @@
+#+TITLE: fold-dwim-org
+#+AUTHOR: Use dwim interface to org-folding
+
+Modification of hideshow-org which is located originally at: 
+							     
+=git clone git://github.com/secelis/hideshow-org.git=

@@ -1,17 +1,17 @@
 ;;; fold-dwim-org.el --- Fold DWIM bound to org key-strokes.
 ;; 
 ;; Filename: fold-dwim-org.el
-;; Description: 
+;; Description: Fold DWIM bound to org key-strokes.
 ;; Author: Matthew L. Fidler & Shane Celis
 ;; Maintainer: Matthew L. Fidler
 ;; Created: Tue Oct  5 12:19:45 2010 (-0500)
-;; Version: 0.1
+;; Version: 0.2
 ;; Package-Requires: ((fold-dwim "1.2"))
-;; Last-Updated: Thu Dec  1 17:23:33 2011 (-0600)
+;; Last-Updated: Fri Dec  2 08:57:02 2011 (-0600)
 ;;           By: Matthew L. Fidler
-;;     Update #: 105
-;; URL: 
-;; Keywords: 
+;;     Update #: 108
+;; URL: https://github.com/mlf176f2/fold-dwim-org
+;; Keywords: Folding Emacs Org-mode
 ;; Compatibility: 
 ;; 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -24,7 +24,16 @@
 ;; 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
-;; Change Log:
+;;; Change Log:
+;; 02-Dec-2011    Matthew L. Fidler  
+;;    Last-Updated: Thu Dec  1 17:23:33 2011 (-0600) #105 (Matthew L. Fidler)
+;;    Added Autoload cookies
+;; 08-Feb-2011    Matthew L. Fidler  
+;;    Last-Updated: Mon Oct 25 10:57:19 2010 (-0500) #33 (Matthew L. Fidler) #102 (Matthew L. Fidler)
+;;    Added code to byte-compile properly
+;; 08-Feb-2011    Matthew L. Fidler  
+;;    Last-Updated: Mon Oct 25 10:57:19 2010 (-0500) #33 (Matthew L. Fidler) #98 (Matthew L. Fidler)
+;;    Updated ELPA type comments.
 ;; 15-Nov-2010    Matthew L. Fidler  
 ;;    Last-Updated: Mon Oct 25 10:57:19 2010 (-0500) #33 (Matthew L. Fidler) #91 (Matthew L. Fidler)
 ;;    Bug fix -- make sure to save excursion.
@@ -75,17 +84,6 @@
 ;; 
 ;;; Code:
 
-;; Change Log:
-;; 08-Feb-2011    Matthew L. Fidler  
-;;    Last-Updated: Mon Oct 25 10:57:19 2010 (-0500) #33 (Matthew L. Fidler) #102 (Matthew L. Fidler)
-;;    Added code to byte-compile properly 
-
-;; 08-Feb-2011    Matthew L. Fidler  
-;;    Last-Updated: Mon Oct 25 10:57:19 2010 (-0500) #33 (Matthew L. Fidler) #98 (Matthew L. Fidler)
-;;    Updated ELPA type comments.
-
-
-
 
 (require 'fold-dwim)
 (eval-when  (compile load eval)
@@ -106,22 +104,18 @@
   (setq fold-dwim-org/minor-mode-map (make-sparse-keymap)))
 
 (dolist (var '(fold-dwim-org/minor-mode
-               fold-dwim-org/hide-show-all-next
-               ))
+               fold-dwim-org/hide-show-all-next))
   (make-variable-buffer-local var))
 
 (defmacro fold-dwim-org/define-keys ()
   `(progn 
      ,@(when fold-dwim-org/trigger-keys-block (mapcar (lambda (key) `(fold-dwim-org/define-key ,key fold-dwim-org/toggle)) fold-dwim-org/trigger-keys-block))
-     ,@(mapcar (lambda (key) `(fold-dwim-org/define-key ,key fold-dwim-org/hideshow-all)) fold-dwim-org/trigger-keys-all)
-     ))
-(defvar fold-dwim-org/last-point nil
-  )
+     ,@(mapcar (lambda (key) `(fold-dwim-org/define-key ,key fold-dwim-org/hideshow-all)) fold-dwim-org/trigger-keys-all)))
+(defvar fold-dwim-org/last-point nil)
 (defvar fold-dwim-org/last-txt nil)
 (defun fold-dwim-org/should-fold (last-point current-point)
   "* Checks to see if buffer has changed.  If not folding should occur."
-  (equal last-point current-point)
-  )
+  (equal last-point current-point))
 (defvar fold-dwim-org/mark-active nil)
 (make-variable-buffer-local 'fold-dwim-org/mark-active)
 (defun fold-dwim-org/hs-pre ()
@@ -131,11 +125,7 @@
       (unless (minibufferp)
         (setq fold-dwim-org/mark-active mark-active)
         (setq fold-dwim-org/last-point (point))
-        (setq fold-dwim-org/last-txt (buffer-substring (point-at-bol) (point-at-eol)))
-        )
-      )
-    )
-  )
+        (setq fold-dwim-org/last-txt (buffer-substring (point-at-bol) (point-at-eol)))))))
 (defun fold-dwim-org/hs-post ()
   "* Post-command hook to hide/show if `fold-dwim-org/trigger-keys-block' is nil"
   (condition-case error
@@ -158,7 +148,7 @@
 (defmacro fold-dwim-org/define-key (key function)
   `(define-key fold-dwim-org/minor-mode-map ,key (lambda () (interactive)
                                                    (,function ,key))))
-
+;;;###autoload
 (define-minor-mode fold-dwim-org/minor-mode
   "Toggle fold-dwim-org minor mode.
 With no argument, this command toggles the mode.
@@ -178,19 +168,14 @@ You can customize the key through `fold-dwim-org/trigger-key-block'."
 
   (fold-dwim-org/define-keys)
   ;; We want hs-minor-mode on when fold-dwim-org/minor-mode is on.
-  (let (
-        (hs (assoc 'hs-minor-mode minor-mode-alist))
-        )
+  (let ((hs (assoc 'hs-minor-mode minor-mode-alist)))
     (when hs
       (setq hs (cdr hs))
       (if fold-dwim-org/minor-mode
           (setcar hs (replace-regexp-in-string "[*]*$" "*" (car hs)))
-        (setcar hs (replace-regexp-in-string "[*]+$" "" (car hs)))
-        )
-      )
+        (setcar hs (replace-regexp-in-string "[*]+$" "" (car hs)))))
     ;; TODO add indicators in other modes.
-    )
-  )
+    ))
 
 (defun fold-dwim-org/toggle (&optional key lst-point)
   "Hide or show a block."
@@ -208,12 +193,9 @@ You can customize the key through `fold-dwim-org/trigger-key-block'."
         (setq other-keys (cdr other-keys)))
       (unless lst-point
         (if (commandp command)
-            (call-interactively command)
-          )
-        )
+            (call-interactively command)))
       (when (fold-dwim-org/should-fold last-point (point))
-        (fold-dwim-toggle)
-        ))))
+        (fold-dwim-toggle)))))
 
 (defun fold-dwim-org/hideshow-all (&optional key)
   "Hide or show all blocks."

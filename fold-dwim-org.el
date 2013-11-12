@@ -86,8 +86,17 @@
 
 
 (require 'fold-dwim)
+
+(defgroup fold-dwim-org nil
+  "Org-mode fold dwim.")
+
+(defcustom fold-dwim-org-strict t
+  "Strict folding. Will only fold when at a folding marker."
+  :type 'boolean
+  :group 'fold-dwim-org)
+
 (eval-when  (compile load eval)
-  (defvar fold-dwim-org/trigger-keys-block nil;(list (kbd "TAB"))
+  (defvar fold-dwim-org/trigger-keys-block (list (kbd "TAB"))
   "The keys to bind to toggle block visibility.")
 
 (defvar fold-dwim-org/trigger-keys-all (list [S-tab] [S-iso-lefttab] [(shift tab)] [backtab])
@@ -137,7 +146,13 @@
                 (when (eq ?\t last-command-event)
                   (unless (and (fboundp 'yas/snippets-at-point)
                                (< 0 (length (yas/snippets-at-point 'all-snippets))))
-                    (fold-dwim-org/toggle nil fold-dwim-org/last-point))))))))
+                    (when (or (not fold-dwim-org-strict)
+                              (and fold-dwim-org-strict
+                                   (= (point)
+                                      (save-excursion
+                                        (hs-find-block-beginning)
+                                        (point)))))
+                        (fold-dwim-org/toggle nil fold-dwim-org/last-point)))))))))
     (error
      (message "HS Org post-command hook error: %s" (error-message-string error)))))
 

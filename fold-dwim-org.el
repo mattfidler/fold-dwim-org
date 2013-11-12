@@ -5,7 +5,7 @@
 ;; Author: Matthew L. Fidler & Shane Celis
 ;; Maintainer: Matthew L. Fidler
 ;; Created: Tue Oct  5 12:19:45 2010 (-0500)
-;; Version: 0.2
+;; Version: 0.3
 ;; Package-Requires: ((fold-dwim "1.2"))
 ;; Last-Updated: Fri Dec  2 08:57:02 2011 (-0600)
 ;;           By: Matthew L. Fidler
@@ -18,13 +18,16 @@
 ;; 
 ;;; Commentary: 
 ;; 
-;; Modification of hideshow-org which is located originally at:
-;;
-;; git clone git://github.com/secelis/hideshow-org.git
+;; Modification of hideshow-org which is located originally at: 
+;; 							     
+;; `git clone git://github.com/secelis/hideshow-org.git'
 ;; 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;; Change Log:
+;; 12-Nov-2013    Matthew L. Fidler  
+;;    Last-Updated: Fri Dec  2 08:57:02 2011 (-0600) #108 (Matthew L. Fidler)
+;;    Upload to marmalade.
 ;; 02-Dec-2011    Matthew L. Fidler  
 ;;    Last-Updated: Thu Dec  1 17:23:33 2011 (-0600) #105 (Matthew L. Fidler)
 ;;    Added Autoload cookies
@@ -123,20 +126,37 @@
 (defvar fold-dwim-org/last-point nil)
 (defvar fold-dwim-org/last-txt nil)
 (defun fold-dwim-org/should-fold (last-point current-point)
-  "* Checks to see if buffer has changed.  If not folding should occur."
+  "Checks to see if buffer has changed.  If not folding should occur."
   (equal last-point current-point))
 (defvar fold-dwim-org/mark-active nil)
 (make-variable-buffer-local 'fold-dwim-org/mark-active)
 (defun fold-dwim-org/hs-pre ()
-  "* Pre-command hook to save last point.  Only used if `fold-dwim-org/trigger-keys-block' is nil"
+  "Pre-command hook to save last point.  Only used if `fold-dwim-org/trigger-keys-block' is nil"
   (when fold-dwim-org/minor-mode
     (unless fold-dwim-org/trigger-keys-block
       (unless (minibufferp)
         (setq fold-dwim-org/mark-active mark-active)
         (setq fold-dwim-org/last-point (point))
         (setq fold-dwim-org/last-txt (buffer-substring (point-at-bol) (point-at-eol)))))))
+
+(defun fold-dwim-org/should-fold-p ()
+  "Checks to see if buffer has changed.
+If not folding should occur. Then checks if we want strict folding, and if yes, if we are at a folding mark."
+  (save-excursion
+    (and (equal (point) fold-dwim-org/last-point)
+         (or (not fold-dwim-org-strict)
+             (and fold-dwim-org-strict
+                  (or (and (boundp 'folding-mode)
+                           hs-minor-mode
+                           (= (point)
+                              (hs-find-block-beginning)
+                              (point)))
+                      (and (boundp 'folding-mode)
+                           folding-mode
+                           (= (line-number-at-pos (point))
+                              (line-number-at-pos (or (folding-find-folding-mark) (point)))))))))))
 (defun fold-dwim-org/hs-post ()
-  "* Post-command hook to hide/show if `fold-dwim-org/trigger-keys-block' is nil"
+  "Post-command hook to hide/show if `fold-dwim-org/trigger-keys-block' is nil"
   (condition-case error
       (progn
         (when fold-dwim-org/minor-mode
@@ -146,13 +166,8 @@
                 (when (eq ?\t last-command-event)
                   (unless (and (fboundp 'yas/snippets-at-point)
                                (< 0 (length (yas/snippets-at-point 'all-snippets))))
-                    (when (or (not fold-dwim-org-strict)
-                              (and fold-dwim-org-strict
-                                   (= (point)
-                                      (save-excursion
-                                        (hs-find-block-beginning)
-                                        (point)))))
-                        (fold-dwim-org/toggle nil fold-dwim-org/last-point)))))))))
+                    (when (fold-dwim-org/should-fold-p)
+                      (fold-dwim-org/toggle nil fold-dwim-org/last-point)))))))))
     (error
      (message "HS Org post-command hook error: %s" (error-message-string error)))))
 

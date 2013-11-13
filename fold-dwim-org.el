@@ -139,22 +139,32 @@
         (setq fold-dwim-org/last-point (point))
         (setq fold-dwim-org/last-txt (buffer-substring (point-at-bol) (point-at-eol)))))))
 
-(defun fold-dwim-org/should-fold-p ()
+(defun fold-dwim-org/should-fold-p (cur-point last-point)
   "Checks to see if buffer has changed.
 If not folding should occur. Then checks if we want strict folding, and if yes, if we are at a folding mark."
   (save-excursion
-    (and (equal (point) fold-dwim-org/last-point)
+    (and (equal cur-point last-point)
          (or (not fold-dwim-org-strict)
              (and fold-dwim-org-strict
-                  (or (and (boundp 'folding-mode)
+                  (or (and (boundp 'hs-minor-mode) 
                            hs-minor-mode
                            (= (point)
                               (hs-find-block-beginning)
                               (point)))
                       (and (boundp 'folding-mode)
                            folding-mode
-                           (= (line-number-at-pos (point))
-                              (line-number-at-pos (or (folding-find-folding-mark) (point)))))))))))
+                           (integerp (folding-mark-look-at)))
+                      (and (boundp 'TeX-fold-mode)
+                           TeX-fold-mode
+                           ;; FIXME : Add a test for strict folding here
+                          )
+                      (and outline-minor-mode
+                           ;; FIXME : Add a test for strict folding here
+                           )
+                      (and (eq major-mode 'nxml-mode)
+                           ;; FIXME : Add a test for strict folding here
+                           )
+                      ))))))
 (defun fold-dwim-org/hs-post ()
   "Post-command hook to hide/show if `fold-dwim-org/trigger-keys-block' is nil"
   (condition-case error
@@ -166,7 +176,7 @@ If not folding should occur. Then checks if we want strict folding, and if yes, 
                 (when (eq ?\t last-command-event)
                   (unless (and (fboundp 'yas/snippets-at-point)
                                (< 0 (length (yas/snippets-at-point 'all-snippets))))
-                    (when (fold-dwim-org/should-fold-p)
+                    (when (fold-dwim-org/should-fold-p (point) fold-dwim-org/last-point)
                       (fold-dwim-org/toggle nil fold-dwim-org/last-point)))))))))
     (error
      (message "HS Org post-command hook error: %s" (error-message-string error)))))
@@ -224,7 +234,7 @@ You can customize the key through `fold-dwim-org/trigger-key-block'."
       (unless lst-point
         (if (commandp command)
             (call-interactively command)))
-      (when (fold-dwim-org/should-fold last-point (point))
+      (when (fold-dwim-org/should-fold-p last-point (point))
         (fold-dwim-toggle)))))
 
 (defun fold-dwim-org/hideshow-all (&optional key)

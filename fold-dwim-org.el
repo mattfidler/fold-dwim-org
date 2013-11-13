@@ -153,7 +153,10 @@ If not folding should occur. Then checks if we want strict folding, and if yes, 
                               (point)))
                       (and (boundp 'folding-mode)
                            folding-mode
-                           (integerp (folding-mark-look-at)))
+                           (let ((looking-at-mark (folding-mark-look-at)))
+                             (or (integerp looking-at-mark)
+                                 (eq looking-at-mark 'end)
+                                 (eq looking-at-mark 'end-in))))
                       (and (boundp 'TeX-fold-mode)
                            TeX-fold-mode
                            ;; FIXME : Add a test for strict folding here

@@ -227,7 +227,7 @@ You can customize the key through `fold-dwim-org/trigger-key-block'."
   "Hide or show a block."
   (interactive)
   (save-excursion
-    (let ((last-point (or lst-point (point)))
+    (let* ((last-point (or lst-point (point)))
            (fold-dwim-org/minor-mode nil)
            (command (if key (key-binding key) nil))
            (other-keys fold-dwim-org/trigger-keys-block))

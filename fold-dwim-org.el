@@ -161,8 +161,11 @@ If not folding should occur. Then checks if we want strict folding, and if yes, 
                            TeX-fold-mode
                            ;; FIXME : Add a test for strict folding here
                           )
-                      (and outline-minor-mode
-                           ;; FIXME : Add a test for strict folding here
+                      (and (or outline-minor-mode
+                               (eq major-mode 'outline-mode))
+                           (save-excursion
+                             (beginning-of-line)
+                             (looking-at outline-regexp))
                            )
                       (and (eq major-mode 'nxml-mode)
                            ;; FIXME : Add a test for strict folding here
@@ -224,7 +227,7 @@ You can customize the key through `fold-dwim-org/trigger-key-block'."
   "Hide or show a block."
   (interactive)
   (save-excursion
-    (let* ((last-point (or lst-point (point)))
+    (let ((last-point (or lst-point (point)))
            (fold-dwim-org/minor-mode nil)
            (command (if key (key-binding key) nil))
            (other-keys fold-dwim-org/trigger-keys-block))

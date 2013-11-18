@@ -5,7 +5,7 @@
 ;; Author: Matthew L. Fidler & Shane Celis
 ;; Maintainer: Matthew L. Fidler
 ;; Created: Tue Oct  5 12:19:45 2010 (-0500)
-;; Version: 0.3
+;; Version: 0.4
 ;; Package-Requires: ((fold-dwim "1.2"))
 ;; Last-Updated: Fri Dec  2 08:57:02 2011 (-0600)
 ;;           By: Matthew L. Fidler
@@ -18,13 +18,13 @@
 ;; 
 ;;; Commentary: 
 ;; 
-;; Modification of hideshow-org which is located originally at: 
-;; 							     
-;; `git clone git://github.com/secelis/hideshow-org.git'
 ;; 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;; Change Log:
+;; 18-Nov-2013    Matthew L. Fidler  
+;;    Last-Updated: Fri Dec  2 08:57:02 2011 (-0600) #108 (Matthew L. Fidler)
+;;    Bug fix and version bump.
 ;; 12-Nov-2013    Matthew L. Fidler  
 ;;    Last-Updated: Fri Dec  2 08:57:02 2011 (-0600) #108 (Matthew L. Fidler)
 ;;    Upload to marmalade.

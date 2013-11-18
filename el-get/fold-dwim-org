@@ -1,0 +1,6 @@
+(:name fold-dwim-org
+ :description "fold-dwim-org"
+ :depends (fold-dwim)
+ :website "https://github.com/mlf176f2/fold-dwim-org"
+ :type git
+ :url "https://github.com/mlf176f2/fold-dwim-org.git")

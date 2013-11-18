@@ -1,6 +1,43 @@
 #+TITLE: fold-dwim-org
 #+AUTHOR: Use dwim interface to org-folding
+* Library Information
+ /fold-dwim-org.el/ --- Fold DWIM bound to org key-strokes.
 
-Modification of hideshow-org which is located originally at: 
-							     
-=git clone git://github.com/secelis/hideshow-org.git=
+ - Filename :: [[file:fold-dwim-org.el][fold-dwim-org.el]]
+ - Description :: Fold DWIM bound to org key-strokes.
+ - Author :: Matthew L. Fidler & Shane Celis
+ - Maintainer :: Matthew L. Fidler
+ - Created :: Tue Oct  5 12:19:45 2010 (-0500)
+ - Version :: 0.4
+ - Package-Requires :: ((fold-dwim "1.2"))
+ - Last-Updated :: Fri Dec  2 08:57:02 2011 (-0600)
+ -           By :: Matthew L. Fidler
+ -     Update # :: 108
+ - URL :: https://github.com/mlf176f2/fold-dwim-org
+ - Keywords :: Folding Emacs Org-mode
+Compatibility: 
+
+* Functions
+** Interactive Functions
+
+** Internal Functions
+* Variables
+** Customizable Variables
+
+** Internal Variables
+* History
+
+ - 18-Nov-2013 ::  Bug fix and version bump. (Matthew L. Fidler)
+ - 12-Nov-2013 ::  Upload to marmalade. (Matthew L. Fidler)
+ - 02-Dec-2011 ::  Added Autoload cookies (Matthew L. Fidler)
+ - 08-Feb-2011 ::  Added code to byte-compile properly (Matthew L. Fidler)
+ - 08-Feb-2011 ::  Updated ELPA type comments. (Matthew L. Fidler)
+ - 15-Nov-2010 ::  Bug fix -- make sure to save excursion. (Matthew L. Fidler)
+ - 05-Nov-2010 ::  Will not hide when there is a region selected. (US041375)
+ - 02-Nov-2010 ::  Made post-command-hook enclosed in condition-case (Matthew L. Fidler)
+ - 28-Oct-2010 ::  Do not fold while expanding a yasnippet. (Matthew L. Fidler)
+ - 25-Oct-2010 ::  Removed string check (Matthew L. Fidler)
+ - 25-Oct-2010 ::  Changed symbol (Matthew L. Fidler)
+ - 25-Oct-2010 ::  Added check based on last point is equal to current point and current line is equal to what is was before. (Matthew L. Fidler)
+ - 25-Oct-2010 ::  Added interface to allow pre and post command hooks instead of overwriting the definition of [TAB]. Doesn't mess with as many key bindings... (Matthew L. Fidler)
+ - 25-Oct-2010 ::  Added indent-for-tab-command when key is undefined...  (Matthew L. Fidler)

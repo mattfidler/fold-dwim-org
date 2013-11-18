@@ -149,8 +149,7 @@ If not folding should occur. Then checks if we want strict folding, and if yes, 
                   (or (and (boundp 'hs-minor-mode) 
                            hs-minor-mode
                            (= (point)
-                              (hs-find-block-beginning)
-                              (point)))
+                              (hs-find-block-beginning)))
                       (and (boundp 'folding-mode)
                            folding-mode
                            (let ((looking-at-mark (folding-mark-look-at)))

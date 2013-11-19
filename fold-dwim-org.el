@@ -5,7 +5,7 @@
 ;; Author: Matthew L. Fidler & Shane Celis
 ;; Maintainer: Matthew L. Fidler
 ;; Created: Tue Oct  5 12:19:45 2010 (-0500)
-;; Version: 0.4
+;; Version: 0.5
 ;; Package-Requires: ((fold-dwim "1.2"))
 ;; Last-Updated: Fri Dec  2 08:57:02 2011 (-0600)
 ;;           By: Matthew L. Fidler
@@ -22,6 +22,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;; Change Log:
+;; 19-Nov-2013    Matthew L. Fidler  
+;;    Last-Updated: Fri Dec  2 08:57:02 2011 (-0600) #108 (Matthew L. Fidler)
+;;    Version bump after integrating LaTex folding.
 ;; 18-Nov-2013    Matthew L. Fidler  
 ;;    Last-Updated: Fri Dec  2 08:57:02 2011 (-0600) #108 (Matthew L. Fidler)
 ;;    Bug fix and version bump.
@@ -170,19 +173,15 @@ If not folding should occur. Then checks if we want strict folding, and if yes, 
                                       ;;('context-mode (ConTeXt-find-matching-start))
                                       ;;('texinfo-mode (Texinfo-find-env-start))
                                       ('latex-mode (LaTeX-find-matching-begin))
-                                      (t nil) 
-                                      )
-                                    (point)
-                                    )))
+                                      (t nil))
+                                    (point))))
                              (eq (line-number-at-pos matching-begin)
-                                 (line-number-at-pos cur-point))                               
-                             ))
+                                 (line-number-at-pos cur-point))))
                       (and (or outline-minor-mode
                                (eq major-mode 'outline-mode))
                            (save-excursion
                              (beginning-of-line)
-                             (looking-at outline-regexp))
-                           )
+                             (looking-at outline-regexp)))
                       (and (eq major-mode 'nxml-mode)
                            ;; FIXME : Add a test for strict folding here
                            )))))))
@@ -241,9 +240,6 @@ You can customize the key through `fold-dwim-org/trigger-key-block'."
 (defun fold-dwim-org/toggle (&optional key lst-point)
   "Hide or show a block."
   (interactive)
-  ;(save-excursion
-  ;; Did this excursion serve some purpose? It looks like it was just
-  ;; cancelling the fallback behavior of tab in some cases.
     (let* ((last-point (or lst-point (point)))
            (fold-dwim-org/minor-mode nil)
            (command (if key (key-binding key) nil))
@@ -264,15 +260,12 @@ You can customize the key through `fold-dwim-org/trigger-key-block'."
                    (progn
                      (back-to-indentation)
                      (and (not (looking-at-end-of-line))
-                          (forward-char 1))
-                     )
-                 )
+                          (forward-char 1))))
                (point))))
         (when (fold-dwim-org/should-fold-p last-point ref-point (point))
           (save-excursion
             (goto-char ref-point)
             (fold-dwim-toggle))))))
-  ;)
 
 (defun fold-dwim-org/hideshow-all (&optional key)
   "Hide or show all blocks."

@@ -8,7 +8,7 @@
 - __Author__ --  Matthew L. Fidler & Shane Celis
 - __Maintainer__ --  Matthew L. Fidler
 - __Created__ --  Tue Oct  5 12:19:45 2010 (-0500)
-- __Version__ --  0.4
+- __Version__ --  0.5
 - __Package-Requires__ --  ((fold-dwim "1.2"))
 - __Last-Updated__ --  Fri Dec  2 08:57:02 2011 (-0600)
 - __By__ --  Matthew L. Fidler
@@ -19,6 +19,7 @@ Compatibility:
 
 ## History
 
+- __19-Nov-2013__ --   Version bump after integrating LaTex folding. (Matthew L. Fidler)
 - __18-Nov-2013__ --   Bug fix and version bump. (Matthew L. Fidler)
 - __12-Nov-2013__ --   Upload to marmalade. (Matthew L. Fidler)
 - __02-Dec-2011__ --   Added Autoload cookies (Matthew L. Fidler)

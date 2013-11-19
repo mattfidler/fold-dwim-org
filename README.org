@@ -8,7 +8,7 @@
  - Author :: Matthew L. Fidler & Shane Celis
  - Maintainer :: Matthew L. Fidler
  - Created :: Tue Oct  5 12:19:45 2010 (-0500)
- - Version :: 0.4
+ - Version :: 0.5
  - Package-Requires :: ((fold-dwim "1.2"))
  - Last-Updated :: Fri Dec  2 08:57:02 2011 (-0600)
  -           By :: Matthew L. Fidler
@@ -27,6 +27,7 @@ Compatibility:
 ** Internal Variables
 * History
 
+ - 19-Nov-2013 ::  Version bump after integrating LaTex folding. (Matthew L. Fidler)
  - 18-Nov-2013 ::  Bug fix and version bump. (Matthew L. Fidler)
  - 12-Nov-2013 ::  Upload to marmalade. (Matthew L. Fidler)
  - 02-Dec-2011 ::  Added Autoload cookies (Matthew L. Fidler)

@@ -139,10 +139,11 @@
         (setq fold-dwim-org/last-point (point))
         (setq fold-dwim-org/last-txt (buffer-substring (point-at-bol) (point-at-eol)))))))
 
-(defun fold-dwim-org/should-fold-p (cur-point last-point)
+(defun fold-dwim-org/should-fold-p (last-point ref-point cur-point)
   "Checks to see if buffer has changed.
 If not folding should occur. Then checks if we want strict folding, and if yes, if we are at a folding mark."
   (save-excursion
+    (goto-char ref-point)
     (and (equal cur-point last-point)
          (or (not fold-dwim-org-strict)
              (and fold-dwim-org-strict
@@ -159,8 +160,20 @@ If not folding should occur. Then checks if we want strict folding, and if yes, 
                                  (eq looking-at-mark 'end-in))))
                       (and (boundp 'TeX-fold-mode)
                            TeX-fold-mode
-                           ;; FIXME : Add a test for strict folding here
-                          )
+                           (eq (fold-dwim-auctex-env-or-macro) 'env) ;; No macros in strict mode
+                           (let ((matching-begin
+                                  (save-excursion
+                                    (case major-mode
+                                      ('context-mode (ConTeXt-find-matching-start))
+                                      ('texinfo-mode (Texinfo-find-env-start))
+                                      ('latex-mode (LaTeX-find-matching-begin))
+                                      (t nil) ;; Fallback for tex-mode
+                                      )
+                                    (point)
+                                    )))
+                             (eq (line-number-at-pos matching-begin)
+                                 (line-number-at-pos (point)))                               
+                             ))
                       (and (or outline-minor-mode
                                (eq major-mode 'outline-mode))
                            (save-excursion
@@ -169,8 +182,7 @@ If not folding should occur. Then checks if we want strict folding, and if yes, 
                            )
                       (and (eq major-mode 'nxml-mode)
                            ;; FIXME : Add a test for strict folding here
-                           )
-                      ))))))
+                           )))))))
 (defun fold-dwim-org/hs-post ()
   "Post-command hook to hide/show if `fold-dwim-org/trigger-keys-block' is nil"
   (condition-case error
@@ -182,7 +194,7 @@ If not folding should occur. Then checks if we want strict folding, and if yes, 
                 (when (eq ?\t last-command-event)
                   (unless (and (fboundp 'yas/snippets-at-point)
                                (< 0 (length (yas/snippets-at-point 'all-snippets))))
-                    (when (fold-dwim-org/should-fold-p (point) fold-dwim-org/last-point)
+                    (when (fold-dwim-org/should-fold-p fold-dwim-org/last-point (point) (point))
                       (fold-dwim-org/toggle nil fold-dwim-org/last-point)))))))))
     (error
      (message "HS Org post-command hook error: %s" (error-message-string error)))))
@@ -226,7 +238,9 @@ You can customize the key through `fold-dwim-org/trigger-key-block'."
 (defun fold-dwim-org/toggle (&optional key lst-point)
   "Hide or show a block."
   (interactive)
-  (save-excursion
+  ;(save-excursion
+  ;; Did this excursion serve some purpose? It looks like it was just
+  ;; cancelling the fallback behavior of tab in some cases.
     (let* ((last-point (or lst-point (point)))
            (fold-dwim-org/minor-mode nil)
            (command (if key (key-binding key) nil))
@@ -240,8 +254,22 @@ You can customize the key through `fold-dwim-org/trigger-key-block'."
       (unless lst-point
         (if (commandp command)
             (call-interactively command)))
-      (when (fold-dwim-org/should-fold-p last-point (point))
-        (fold-dwim-toggle)))))
+      (let ((ref-point
+             ;; Workaround for cases when the point is at the beginning of the line
+             (save-excursion
+               (when fold-dwim-org-strict
+                   (progn
+                     (back-to-indentation)
+                     (and (not (looking-at-end-of-line))
+                          (forward-char 1))
+                     )
+                 )
+               (point))))
+        (when (fold-dwim-org/should-fold-p last-point ref-point (point))
+          (save-excursion
+            (goto-char ref-point)
+            (fold-dwim-toggle))))))
+  ;)
 
 (defun fold-dwim-org/hideshow-all (&optional key)
   "Hide or show all blocks."

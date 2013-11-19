@@ -149,8 +149,8 @@ If not folding should occur. Then checks if we want strict folding, and if yes, 
              (and fold-dwim-org-strict
                   (or (and (boundp 'hs-minor-mode) 
                            hs-minor-mode
-                           (= (point)
-                              (hs-find-block-beginning)))
+                           (= cur-point
+                              (or (hs-find-block-beginning) -1)))
                       (and (boundp 'folding-mode)
                            folding-mode
                            (let ((looking-at-mark (folding-mark-look-at)))
@@ -171,7 +171,7 @@ If not folding should occur. Then checks if we want strict folding, and if yes, 
                                     (point)
                                     )))
                              (eq (line-number-at-pos matching-begin)
-                                 (line-number-at-pos (point)))                               
+                                 (line-number-at-pos cur-point))                               
                              ))
                       (and (or outline-minor-mode
                                (eq major-mode 'outline-mode))

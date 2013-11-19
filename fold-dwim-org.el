@@ -159,14 +159,18 @@ If not folding should occur. Then checks if we want strict folding, and if yes, 
                                  (eq looking-at-mark 'end-in))))
                       (and (boundp 'TeX-fold-mode)
                            TeX-fold-mode
-                           (eq (fold-dwim-auctex-env-or-macro) 'env) ;; No macros in strict mode
+                           (not (eq major-mode 'latex-mode)))
+                      (and (boundp 'TeX-fold-mode)
+                           TeX-fold-mode
+                           ;; No macros in strict mode (for latex at least)
+                           (eq (fold-dwim-auctex-env-or-macro) 'env)
                            (let ((matching-begin
                                   (save-excursion
                                     (case major-mode
-                                      ('context-mode (ConTeXt-find-matching-start))
-                                      ('texinfo-mode (Texinfo-find-env-start))
+                                      ;;('context-mode (ConTeXt-find-matching-start))
+                                      ;;('texinfo-mode (Texinfo-find-env-start))
                                       ('latex-mode (LaTeX-find-matching-begin))
-                                      (t nil) ;; Fallback for tex-mode
+                                      (t nil) 
                                       )
                                     (point)
                                     )))

@@ -1,0 +1,4 @@
+(fold-dwim-org
+ :repo "mlf176f2/fold-dwim-org"
+ :fetcher github
+ :files ("fold-dwim-org.el" "dir" "fold-dwim-org.info"))
